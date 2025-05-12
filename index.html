@@ -198,12 +198,22 @@ function exemplo() {
             const end = editor.selectionEnd;
             const selectedText = editor.value.substring(start, end);
             
-            editor.value = editor.value.substring(0, start) + before + selectedText + after + editor.value.substring(end);
+            // Se não há texto selecionado, posiciona o cursor entre os marcadores
+            const newText = before + (selectedText || '') + after;
+            editor.value = editor.value.substring(0, start) + newText + editor.value.substring(end);
             
-            editor.selectionStart = start + before.length;
-            editor.selectionEnd = start + before.length + selectedText.length;
+            // Ajusta a posição do cursor
+            if (!selectedText) {
+                editor.selectionStart = start + before.length;
+                editor.selectionEnd = start + before.length;
+            } else {
+                editor.selectionStart = start + before.length;
+                editor.selectionEnd = start + before.length + selectedText.length;
+            }
+            
             editor.focus();
             updateStatus('Texto formatado inserido.');
+            updatePreview();
         }
 
         function insertLineBreak() {
