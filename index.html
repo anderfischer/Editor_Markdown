@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor Markdown Avançado</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 20px;
+        }
+        .editor-container {
+            display: flex;
+            gap: 20px;
+            height: 70vh;
+        }
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+                height: auto;
+            }
+        }
+        .editor, .preview {
+            flex: 1;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+        }
+        .editor {
+            font-family: 'Consolas', 'Monaco', monospace;
+            resize: none;
+            border: 1px solid #ddd;
+            min-height: 300px;
+        }
+        .preview {
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        .preview img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            display: block;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 5px 10px;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .format-btn {
+            background-color: #4CAF50;
+        }
+        .format-btn:hover {
+            background-color: #45a049;
+        }
+        .save-btn {
+            background-color: #2196F3;
+        }
+        .save-btn:hover {
+            background-color: #0b7dda;
+        }
+        .load-btn {
+            background-color: #ff9800;
+        }
+        .load-btn:hover {
+            background-color: #e68a00;
+        }
+        .test-btn {
+            background-color: #9c27b0;
+        }
+        .test-btn:hover {
+            background-color: #7b1fa2;
+        }
+        .break-btn {
+            background-color: #607d8b;
+        }
+        .break-btn:hover {
+            background-color: #455a64;
+        }
+        .status {
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
+        .file-input {
+            display: none;
+        }
+        .invalid-image {
+            color: red;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Editor Markdown Avançado</h1>
+        
+        <div class="toolbar">
+            <button class="format-btn" onclick="insertText('**', '**')">Negrito</button>
+            <button class="format-btn" onclick="insertText('*', '*')">Itálico</button>
+            <button class="format-btn" onclick="insertText('~~', '~~')">Tachado</button>
+            <button class="format-btn" onclick="insertText('# ', '')">Título 1</button>
+            <button class="format-btn" onclick="insertText('## ', '')">Título 2</button>
+            <button class="format-btn" onclick="insertText('### ', '')">Título 3</button>
+            <button class="format-btn" onclick="insertText('- ', '')">Lista</button>
+            <button class="format-btn" onclick="insertText('1. ', '')">Lista Num.</button>
+            <button class="format-btn" onclick="insertText('[', '](url)')">Link</button>
+            <button class="format-btn" onclick="insertText('![', '](https://exemplo.com/imagem.jpg)')">Imagem</button>
+            <button class="format-btn" onclick="insertText('> ', '')">Citação</button>
+            <button class="format-btn" onclick="insertText('```\n', '\n```')">Código</button>
+            <button class="format-btn" onclick="insertText('\n---\n', '')">Linha</button>
+            <button class="format-btn" onclick="insertText('&nbsp;', '')">Espaço</button>
+            <button class="break-btn" onclick="insertLineBreak()">Quebra Linha</button>
+            
+            <button class="save-btn" onclick="saveAsTxt()">Salvar como TXT</button>
+            <button class="save-btn" onclick="saveAsMd()">Salvar como MD</button>
+            <button class="load-btn" onclick="document.getElementById('fileInput').click()">Carregar Arquivo</button>
+            <button class="test-btn" onclick="insertTestImage()">Testar Imagem</button>
+            <input type="file" id="fileInput" class="file-input" accept=".txt,.md" onchange="loadFile(this)">
+        </div>
+        
+        <div class="status" id="status"></div>
+        
+        <div class="editor-container">
+            <textarea id="editor" class="editor" placeholder="Digite seu Markdown aqui..."></textarea>
+            <div id="preview" class="preview"></div>
+        </div>
+    </div>
+
+    <script>
+        // Elementos do DOM
+        const editor = document.getElementById('editor');
+        const preview = document.getElementById('preview');
+        const statusEl = document.getElementById('status');
+        const STORAGE_KEY = 'markdownEditorContent';
+        const AUTO_SAVE_INTERVAL = 2000;
+
+        // Inicializar o editor
+        function initEditor() {
+            const savedContent = localStorage.getItem(STORAGE_KEY);
+            if (savedContent) {
+                editor.value = savedContent;
+                updateStatus('Conteúdo anterior carregado automaticamente.');
+            } else {
+                editor.value = `# Exemplo de Markdown
+
+## Formatação Básica
+**Negrito**, *itálico*, ~~tachado~~
+
+## Listas
+- Item 1
+- Item 2
+
+## Imagem de Exemplo
+![Logo Google](https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png)
+
+## Código
+\`\`\`javascript
+function exemplo() {
+    return "Hello World";
+}
+\`\`\``;
+                updateStatus('Editor pronto. Comece a digitar!');
+            }
+            updatePreview();
+            setInterval(autoSave, AUTO_SAVE_INTERVAL);
+            window.addEventListener('beforeunload', autoSave);
+            editor.addEventListener('blur', autoSave);
+            editor.addEventListener('input', updatePreview);
+        }
+
+        // Funções de formatação
+        function insertText(before, after) {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const selectedText = editor.value.substring(start, end);
+            
+            editor.value = editor.value.substring(0, start) + before + selectedText + after + editor.value.substring(end);
+            
+            editor.selectionStart = start + before.length;
+            editor.selectionEnd = start + before.length + selectedText.length;
+            editor.focus();
+            updateStatus('Texto formatado inserido.');
+        }
+
+        function insertLineBreak() {
+            const pos = editor.selectionStart;
+            editor.value = editor.value.substring(0, pos) + '  \n' + editor.value.substring(pos);
+            editor.selectionStart = pos + 3;
+            editor.selectionEnd = pos + 3;
+            editor.focus();
+            updateStatus('Quebra de linha inserida.');
+            updatePreview();
+        }
+
+        function insertTestImage() {
+            const images = [
+                '![Logo Google](https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png)',
+                '![GitHub](https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png)',
+                '![Placeholder](https://via.placeholder.com/150)'
+            ];
+            const randomImage = images[Math.floor(Math.random() * images.length)];
+            
+            const cursorPos = editor.selectionStart;
+            editor.value = editor.value.substring(0, cursorPos) + '\n\n' + randomImage + '\n\n' + editor.value.substring(cursorPos);
+            
+            editor.selectionStart = cursorPos + randomImage.length + 4;
+            editor.selectionEnd = editor.selectionStart;
+            editor.focus();
+            updateStatus('Imagem de teste inserida.');
+            updatePreview();
+        }
+
+        // Funções de arquivo
+        function saveAsTxt() {
+            const content = editor.value;
+            const defaultName = 'documento-' + new Date().toISOString().split('T')[0];
+            const filename = prompt("Nome do arquivo:", defaultName + '.txt') || defaultName + '.txt';
+            downloadFile(content, filename, 'text/plain');
+            updateStatus('Arquivo TXT salvo: ' + filename);
+        }
+
+        function saveAsMd() {
+            const content = editor.value;
+            const defaultName = 'documento-' + new Date().toISOString().split('T')[0];
+            const filename = prompt("Nome do arquivo:", defaultName + '.md') || defaultName + '.md';
+            downloadFile(content, filename, 'text/markdown');
+            updateStatus('Arquivo MD salvo: ' + filename);
+        }
+
+        function loadFile(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                editor.value = e.target.result;
+                updatePreview();
+                updateStatus('Arquivo carregado: ' + file.name);
+                autoSave();
+            };
+            reader.readAsText(file);
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:' + mimeType + ';charset=utf-8,' + encodeURIComponent(content));
+            element.setAttribute('download', filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        // Pré-visualização e status
+        function updatePreview() {
+            preview.innerHTML = marked.parse(editor.value);
+            autoSave();
+        }
+
+        function updateStatus(message) {
+            statusEl.textContent = message;
+        }
+
+        function autoSave() {
+            localStorage.setItem(STORAGE_KEY, editor.value);
+        }
+
+        // Parser Markdown
+        const marked = {
+            parse: (markdown) => {
+                let html = markdown
+                    // Headers
+                    .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                    .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                    .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                    // Ênfase
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/~~(.*?)~~/g, '<del>$1</del>')
+                    // Links e imagens
+                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+                    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(match, alt, src) {
+                        const cleanSrc = src.trim();
+                        return /^(https?:|data:|\/)/.test(cleanSrc) 
+                            ? `<img src="${cleanSrc}" alt="${alt}" onerror="this.onerror=null;this.style.display='none'">`
+                            : `<span class="invalid-image">[Imagem inválida: ${cleanSrc}]</span>`;
+                    })
+                    // Blocos
+                    .replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>')
+                    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+                    .replace(/`(.*?)`/g, '<code>$1</code>')
+                    // Listas
+                    .replace(/^\s*[\*\-+]\s(.*$)/gm, '<li>$1</li>')
+                    .replace(/^\s*\d+\.\s(.*$)/gm, '<li>$1</li>')
+                    // Linhas e quebras
+                    .replace(/^\s*---\s*$/gm, '<hr>')
+                    .replace(/  \n/g, '<br>')
+                    // Parágrafos
+                    .replace(/^(?!<[a-z])(.*$)/gm, function(m) {
+                        return m.trim() ? '<p>' + m + '</p>' : '';
+                    });
+
+                // Processar listas
+                html = html.replace(/(<li>.*?<\/li>)+/g, function(match) {
+                    return match.startsWith('<li>') ? '<ul>' + match + '</ul>' : match;
+                });
+
+                return html;
+            }
+        };
+
+        // Inicializar
+        window.onload = initEditor;
+    </script>
+</body>
+</html>
