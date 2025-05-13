@@ -3,206 +3,662 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editor Markdown Avançado</title>
+    <title>Editor Markdown Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --primary-dark: #4338ca;
+            --secondary: #6b7280;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --background: #f9fafb;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --color-light: #6ec3f7;
+            --color-dark: #3a7bd5;
+            --green-light: #a8e063;
+            --green-dark: #56ab2f;
+            --red-light: #ff7b7b;
+            --red-dark: #ff4d4d;
+            --purple-light: #b06ab3;
+            --purple-dark: #8a2be2;
+            --orange-light: #ffb347;
+            --orange-dark: #ff8c00;
+            --toolbar-bg: rgba(255, 255, 255, 0.95);
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 24px;
+        }
+
         .container {
+            max-width: 1400px;
+            margin: 0 auto;
             display: flex;
             flex-direction: column;
-            max-width: 1200px;
-            margin: 0 auto;
-            gap: 20px;
+            gap: 24px;
         }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 2.2rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
         .editor-container {
             display: flex;
-            gap: 20px;
+            gap: 24px;
             height: 70vh;
         }
-        @media (max-width: 768px) {
+
+        @media (max-width: 1024px) {
             .editor-container {
                 flex-direction: column;
                 height: auto;
             }
         }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--surface);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .panel:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-badge {
+            background-color: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
         .editor, .preview {
             flex: 1;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            background-color: white;
-        }
-        .editor {
-            font-family: 'Consolas', 'Monaco', monospace;
-            resize: none;
-            border: 1px solid #ddd;
-            min-height: 300px;
-        }
-        .preview {
+            padding: 20px;
             overflow-y: auto;
-            border: 1px solid #ddd;
+            background-color: var(--surface);
         }
+
+        .editor {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            resize: none;
+            border: none;
+            outline: none;
+        }
+
+        .preview {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+        }
+
+        .preview h1, .preview h2, .preview h3 {
+            margin-top: 1.5em;
+            margin-bottom: 1em;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .preview h1 {
+            font-size: 1.8em;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.3em;
+        }
+
+        .preview h2 {
+            font-size: 1.5em;
+        }
+
+        .preview h3 {
+            font-size: 1.2em;
+        }
+
+        .preview p {
+            margin-bottom: 1em;
+        }
+
         .preview img {
             max-width: 100%;
-            border: 1px solid #ddd;
-            margin: 10px 0;
-            display: block;
+            border-radius: var(--border-radius);
+            margin: 1em 0;
+            border: 1px solid var(--border);
         }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .toolbar {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-        }
-        button {
-            padding: 5px 10px;
-            color: white;
-            border: none;
+
+        .preview code {
+            font-family: 'Roboto Mono', monospace;
+            background-color: var(--background);
+            padding: 0.2em 0.4em;
             border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
+            font-size: 0.9em;
+            color: var(--text-primary);
         }
-        .format-btn {
-            background-color: #4CAF50;
+
+        .preview pre {
+            background-color: var(--background);
+            padding: 1em;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            margin: 1em 0;
+            border: 1px solid var(--border);
         }
-        .format-btn:hover {
-            background-color: #45a049;
+
+        .preview pre code {
+            background-color: transparent;
+            padding: 0;
         }
-        .save-btn {
-            background-color: #2196F3;
-        }
-        .save-btn:hover {
-            background-color: #0b7dda;
-        }
-        .load-btn {
-            background-color: #ff9800;
-        }
-        .load-btn:hover {
-            background-color: #e68a00;
-        }
-        .test-btn {
-            background-color: #9c27b0;
-        }
-        .test-btn:hover {
-            background-color: #7b1fa2;
-        }
-        .break-btn {
-            background-color: #607d8b;
-        }
-        .break-btn:hover {
-            background-color: #455a64;
-        }
-        .status {
-            font-size: 14px;
-            color: #666;
+
+        .preview blockquote {
+            border-left: 3px solid var(--border);
+            padding-left: 1em;
+            color: var(--text-secondary);
+            margin: 1em 0;
             font-style: italic;
         }
+
+        .preview ul, .preview ol {
+            margin-left: 2em;
+            margin-bottom: 1em;
+        }
+
+        .preview li {
+            margin-bottom: 0.5em;
+        }
+
+        .preview hr {
+            border: none;
+            height: 1px;
+            background-color: var(--border);
+            margin: 2em 0;
+        }
+
+        /* Estilo aprimorado para a toolbar */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 12px;
+            border-radius: var(--border-radius);
+            position: sticky;
+            top: 20px;
+            z-index: 10;
+            justify-content: center;
+            background-color: var(--toolbar-bg);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+
+        .toolbar:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Estilo dos botões com efeito de clique realista */
+        .tool-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            text-decoration: none;
+            color: #fff;
+            font-size: 12px;
+            border-radius: 50px;
+            width: 60px;
+            height: 60px;
+            font-weight: 500;
+            transition: all 0.15s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            box-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.2),
+                0 4px 8px rgba(0, 0, 0, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            border: none;
+            outline: none;
+            flex-direction: column;
+            padding: 6px;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .tool-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tool-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.05);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .tool-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.2),
+                0 8px 16px rgba(0, 0, 0, 0.1),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .tool-btn:hover::before {
+            opacity: 1;
+        }
+
+        .tool-btn:active {
+            transform: translateY(2px) scale(0.98);
+            box-shadow: 
+                0 1px 2px rgba(0, 0, 0, 0.2),
+                inset 0 2px 2px rgba(0, 0, 0, 0.1);
+            transition: all 0.1s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        }
+
+        .tool-btn:active::after {
+            opacity: 1;
+        }
+
+        .tool-btn i {
+            font-size: 16px;
+            margin-bottom: 4px;
+            transition: transform 0.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tool-btn:hover i {
+            transform: scale(1.2);
+        }
+
+        .tool-btn:active i {
+            transform: scale(0.95);
+        }
+
+        .tool-btn span {
+            font-size: 10px;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tool-btn:hover span {
+            font-weight: 600;
+        }
+
+        /* Cores dos botões por categoria */
+        .format-btn {
+            --color-light: var(--purple-light);
+            --color-dark: var(--purple-dark);
+            background-image: linear-gradient(to bottom, var(--color-light), var(--color-dark));
+        }
+
+        .heading-btn {
+            --color-light: var(--primary-light);
+            --color-dark: var(--primary-dark);
+            background-image: linear-gradient(to bottom, var(--color-light), var(--color-dark));
+        }
+
+        .list-btn {
+            --color-light: var(--green-light);
+            --color-dark: var(--green-dark);
+            background-image: linear-gradient(to bottom, var(--color-light), var(--color-dark));
+        }
+
+        .insert-btn {
+            --color-light: var(--orange-light);
+            --color-dark: var(--orange-dark);
+            background-image: linear-gradient(to bottom, var(--color-light), var(--color-dark));
+        }
+
+        .file-btn {
+            --color-light: var(--red-light);
+            --color-dark: var(--red-dark);
+            background-image: linear-gradient(to bottom, var(--color-light), var(--color-dark));
+        }
+
         .file-input {
             display: none;
         }
-        .invalid-image {
-            color: red;
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--surface);
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            font-size: 14px;
+        }
+
+        .status-message {
+            color: var(--text-secondary);
             font-style: italic;
+        }
+
+        .status-info {
+            display: flex;
+            gap: 16px;
+        }
+
+        .status-item {
+            color: var(--text-secondary);
+        }
+
+        .status-item strong {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .invalid-image {
+            color: #dc2626;
+            font-style: italic;
+            border: 1px dashed #dc2626;
+            padding: 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Efeito de foco no botão ativo */
+        .tool-btn:focus {
+            animation: pulse 0.5s ease;
+            outline: 2px solid var(--primary-light);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Editor Markdown Avançado</h1>
+        <header>
+            <h1>Editor Markdown Premium</h1>
+            <p class="subtitle">Crie documentos profissionais com facilidade</p>
+        </header>
         
         <div class="toolbar">
-            <button class="format-btn" onclick="insertText('**', '**')">Negrito</button>
-            <button class="format-btn" onclick="insertText('*', '*')">Itálico</button>
-            <button class="format-btn" onclick="insertText('~~', '~~')">Tachado</button>
-            <button class="format-btn" onclick="insertText('# ', '')">Título 1</button>
-            <button class="format-btn" onclick="insertText('## ', '')">Título 2</button>
-            <button class="format-btn" onclick="insertText('### ', '')">Título 3</button>
-            <button class="format-btn" onclick="insertText('- ', '')">Lista</button>
-            <button class="format-btn" onclick="insertText('1. ', '')">Lista Num.</button>
-            <button class="format-btn" onclick="insertText('[', '](url)')">Link</button>
-            <button class="format-btn" onclick="insertText('![', '](https://exemplo.com/imagem.jpg)')">Imagem</button>
-            <button class="format-btn" onclick="insertText('> ', '')">Citação</button>
-            <button class="format-btn" onclick="insertText('```\n', '\n```')">Código</button>
-            <button class="format-btn" onclick="insertText('\n---\n', '')">Linha</button>
-            <button class="format-btn" onclick="insertText('&nbsp;', '')">Espaço</button>
-            <button class="break-btn" onclick="insertLineBreak()">Quebra Linha</button>
+            <button class="tool-btn format-btn" onclick="insertText('**', '**')" title="Negrito">
+                <i class="fas fa-bold"></i>
+                <span>Negrito</span>
+            </button>
+            <button class="tool-btn format-btn" onclick="insertText('*', '*')" title="Itálico">
+                <i class="fas fa-italic"></i>
+                <span>Itálico</span>
+            </button>
+            <button class="tool-btn format-btn" onclick="insertText('~~', '~~')" title="Tachado">
+                <i class="fas fa-strikethrough"></i>
+                <span>Tachado</span>
+            </button>
             
-            <button class="save-btn" onclick="saveAsTxt()">Salvar como TXT</button>
-            <button class="save-btn" onclick="saveAsMd()">Salvar como MD</button>
-            <button class="load-btn" onclick="document.getElementById('fileInput').click()">Carregar Arquivo</button>
-            <button class="test-btn" onclick="insertTestImage()">Testar Imagem</button>
+            <button class="tool-btn heading-btn" onclick="insertText('# ', '')" title="Título 1">
+                <i class="fas fa-heading"></i>
+                <span>Título 1</span>
+            </button>
+            <button class="tool-btn heading-btn" onclick="insertText('## ', '')" title="Título 2">
+                <i class="fas fa-heading"></i>
+                <span>Título 2</span>
+            </button>
+            <button class="tool-btn heading-btn" onclick="insertText('### ', '')" title="Título 3">
+                <i class="fas fa-heading"></i>
+                <span>Título 3</span>
+            </button>
+            
+            <button class="tool-btn list-btn" onclick="insertText('- ', '')" title="Lista não ordenada">
+                <i class="fas fa-list-ul"></i>
+                <span>Lista</span>
+            </button>
+            <button class="tool-btn list-btn" onclick="insertText('1. ', '')" title="Lista ordenada">
+                <i class="fas fa-list-ol"></i>
+                <span>Num.</span>
+            </button>
+            
+            <button class="tool-btn insert-btn" onclick="insertText('[', '](url)')" title="Link">
+                <i class="fas fa-link"></i>
+                <span>Link</span>
+            </button>
+            <button class="tool-btn insert-btn" onclick="insertText('![', '](https://)')" title="Imagem">
+                <i class="fas fa-image"></i>
+                <span>Imagem</span>
+            </button>
+            
+            <button class="tool-btn insert-btn" onclick="insertText('> ', '')" title="Citação">
+                <i class="fas fa-quote-right"></i>
+                <span>Citação</span>
+            </button>
+            <button class="tool-btn insert-btn" onclick="insertText('```\n', '\n```')" title="Bloco de código">
+                <i class="fas fa-code"></i>
+                <span>Código</span>
+            </button>
+            
+            <button class="tool-btn insert-btn" onclick="insertNbsp()" title="Espaço não quebrável">
+                <i class="fas fa-space-shuttle"></i>
+                <span>Espaço</span>
+            </button>
+            <button class="tool-btn insert-btn" onclick="insertText('\n---\n', '')" title="Linha horizontal">
+                <i class="fas fa-minus"></i>
+                <span>Divisor</span>
+            </button>
+            <button class="tool-btn insert-btn" onclick="insertLineBreak()" title="Quebra de linha">
+                <i class="fas fa-level-down-alt"></i>
+                <span>Quebra</span>
+            </button>
+            
+            <button class="tool-btn file-btn" onclick="saveAsMd()" title="Salvar como Markdown">
+                <i class="fas fa-save"></i>
+                <span>Salvar MD</span>
+            </button>
+            <button class="tool-btn file-btn" onclick="saveAsTxt()" title="Salvar como texto">
+                <i class="fas fa-file-alt"></i>
+                <span>Salvar TXT</span>
+            </button>
+            <button class="tool-btn file-btn" onclick="document.getElementById('fileInput').click()" title="Abrir arquivo">
+                <i class="fas fa-folder-open"></i>
+                <span>Abrir</span>
+            </button>
             <input type="file" id="fileInput" class="file-input" accept=".txt,.md" onchange="loadFile(this)">
         </div>
         
-        <div class="status" id="status"></div>
-        
         <div class="editor-container">
-            <textarea id="editor" class="editor" placeholder="Digite seu Markdown aqui..."></textarea>
-            <div id="preview" class="preview"></div>
+            <div class="panel">
+                <div class="panel-header">
+                    <span>Editor</span>
+                    <span class="panel-badge">MARKDOWN</span>
+                </div>
+                <textarea id="editor" class="editor" placeholder="Digite seu conteúdo Markdown aqui..."></textarea>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-header">
+                    <span>Pré-visualização</span>
+                    <span class="panel-badge">HTML</span>
+                </div>
+                <div id="preview" class="preview"></div>
+            </div>
+        </div>
+        
+        <div class="status-bar">
+            <div class="status-message" id="status">Pronto para começar</div>
+            <div class="status-info">
+                <div class="status-item"><strong id="char-count">0</strong> caracteres</div>
+                <div class="status-item"><strong id="word-count">0</strong> palavras</div>
+                <div class="status-item"><strong id="line-count">1</strong> linha</div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Elementos do DOM
         const editor = document.getElementById('editor');
         const preview = document.getElementById('preview');
         const statusEl = document.getElementById('status');
-        const STORAGE_KEY = 'markdownEditorContent';
+        const charCountEl = document.getElementById('char-count');
+        const wordCountEl = document.getElementById('word-count');
+        const lineCountEl = document.getElementById('line-count');
+        const STORAGE_KEY = 'premiumMarkdownEditorContent';
         const AUTO_SAVE_INTERVAL = 2000;
 
-        // Inicializar o editor
         function initEditor() {
             const savedContent = localStorage.getItem(STORAGE_KEY);
             if (savedContent) {
                 editor.value = savedContent;
-                updateStatus('Conteúdo anterior carregado automaticamente.');
+                updateStatus('Conteúdo anterior carregado');
             } else {
-                editor.value = `# Exemplo de Markdown
+                editor.value = `# Bem-vindo ao Editor Markdown Premium
 
 ## Formatação Básica
-**Negrito**, *itálico*, ~~tachado~~
+**Negrito**, *itálico*, ~~tachado~~ e \`código inline\`
 
 ## Listas
 - Item 1
 - Item 2
+  - Subitem
+
+1. Primeiro item
+2. Segundo item
 
 ## Imagem de Exemplo
-![Logo Google](https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png)
+![Markdown](https://markdown-here.com/img/icon256.png)
 
-## Código
+## Bloco de Código
 \`\`\`javascript
 function exemplo() {
-    return "Hello World";
+    console.log("Hello World");
+    return 42;
 }
-\`\`\``;
-                updateStatus('Editor pronto. Comece a digitar!');
+\`\`\`
+
+> Citações aparecem em blocos especiais
+
+---
+
+Linhas horizontais separam seções`;
+                updateStatus('Editor pronto');
             }
             updatePreview();
+            updateCounters();
+            
             setInterval(autoSave, AUTO_SAVE_INTERVAL);
             window.addEventListener('beforeunload', autoSave);
             editor.addEventListener('blur', autoSave);
-            editor.addEventListener('input', updatePreview);
+            editor.addEventListener('input', () => {
+                updatePreview();
+                updateCounters();
+            });
         }
 
-        // Funções de formatação
+        function insertNbsp() {
+            const pos = editor.selectionStart;
+            editor.value = editor.value.substring(0, pos) + '&nbsp;' + editor.value.substring(pos);
+            editor.selectionStart = pos + 6;
+            editor.selectionEnd = pos + 6;
+            editor.focus();
+            updateStatus('Espaço não quebrável inserido');
+            updatePreview();
+            updateCounters();
+        }
+
         function insertText(before, after) {
             const start = editor.selectionStart;
             const end = editor.selectionEnd;
             const selectedText = editor.value.substring(start, end);
             
-            // Se não há texto selecionado, posiciona o cursor entre os marcadores
             const newText = before + (selectedText || '') + after;
             editor.value = editor.value.substring(0, start) + newText + editor.value.substring(end);
             
-            // Ajusta a posição do cursor
             if (!selectedText) {
                 editor.selectionStart = start + before.length;
                 editor.selectionEnd = start + before.length;
@@ -212,8 +668,9 @@ function exemplo() {
             }
             
             editor.focus();
-            updateStatus('Texto formatado inserido.');
+            updateStatus('Formatação aplicada');
             updatePreview();
+            updateCounters();
         }
 
         function insertLineBreak() {
@@ -222,43 +679,25 @@ function exemplo() {
             editor.selectionStart = pos + 3;
             editor.selectionEnd = pos + 3;
             editor.focus();
-            updateStatus('Quebra de linha inserida.');
+            updateStatus('Quebra de linha inserida');
             updatePreview();
+            updateCounters();
         }
 
-        function insertTestImage() {
-            const images = [
-                '![Logo Google](https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png)',
-                '![GitHub](https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png)',
-                '![Placeholder](https://via.placeholder.com/150)'
-            ];
-            const randomImage = images[Math.floor(Math.random() * images.length)];
-            
-            const cursorPos = editor.selectionStart;
-            editor.value = editor.value.substring(0, cursorPos) + '\n\n' + randomImage + '\n\n' + editor.value.substring(cursorPos);
-            
-            editor.selectionStart = cursorPos + randomImage.length + 4;
-            editor.selectionEnd = editor.selectionStart;
-            editor.focus();
-            updateStatus('Imagem de teste inserida.');
-            updatePreview();
-        }
-
-        // Funções de arquivo
         function saveAsTxt() {
             const content = editor.value;
-            const defaultName = 'documento-' + new Date().toISOString().split('T')[0];
-            const filename = prompt("Nome do arquivo:", defaultName + '.txt') || defaultName + '.txt';
+            const defaultName = `documento-${new Date().toISOString().split('T')[0]}.txt`;
+            const filename = prompt("Nome do arquivo:", defaultName) || defaultName;
             downloadFile(content, filename, 'text/plain');
-            updateStatus('Arquivo TXT salvo: ' + filename);
+            updateStatus(`Salvo como TXT: ${filename}`);
         }
 
         function saveAsMd() {
             const content = editor.value;
-            const defaultName = 'documento-' + new Date().toISOString().split('T')[0];
-            const filename = prompt("Nome do arquivo:", defaultName + '.md') || defaultName + '.md';
+            const defaultName = `documento-${new Date().toISOString().split('T')[0]}.md`;
+            const filename = prompt("Nome do arquivo:", defaultName) || defaultName;
             downloadFile(content, filename, 'text/markdown');
-            updateStatus('Arquivo MD salvo: ' + filename);
+            updateStatus(`Salvo como MD: ${filename}`);
         }
 
         function loadFile(input) {
@@ -269,7 +708,8 @@ function exemplo() {
             reader.onload = function(e) {
                 editor.value = e.target.result;
                 updatePreview();
-                updateStatus('Arquivo carregado: ' + file.name);
+                updateCounters();
+                updateStatus(`Arquivo carregado: ${file.name}`);
                 autoSave();
             };
             reader.readAsText(file);
@@ -285,7 +725,13 @@ function exemplo() {
             document.body.removeChild(element);
         }
 
-        // Pré-visualização e status
+        function updateCounters() {
+            const text = editor.value;
+            charCountEl.textContent = text.length;
+            wordCountEl.textContent = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            lineCountEl.textContent = (text.match(/\n/g) || []).length + 1;
+        }
+
         function updatePreview() {
             preview.innerHTML = marked.parse(editor.value);
             autoSave();
@@ -299,42 +745,33 @@ function exemplo() {
             localStorage.setItem(STORAGE_KEY, editor.value);
         }
 
-        // Parser Markdown
         const marked = {
             parse: (markdown) => {
                 let html = markdown
-                    // Headers
                     .replace(/^# (.*$)/gm, '<h1>$1</h1>')
                     .replace(/^## (.*$)/gm, '<h2>$1</h2>')
                     .replace(/^### (.*$)/gm, '<h3>$1</h3>')
-                    // Ênfase
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\*(.*?)\*/g, '<em>$1</em>')
                     .replace(/~~(.*?)~~/g, '<del>$1</del>')
-                    // Links e imagens
-                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+                    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
                     .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, function(match, alt, src) {
                         const cleanSrc = src.trim();
                         return /^(https?:|data:|\/)/.test(cleanSrc) 
-                            ? `<img src="${cleanSrc}" alt="${alt}" onerror="this.onerror=null;this.style.display='none'">`
+                            ? `<img src="${cleanSrc}" alt="${alt}" onerror="this.onerror=null;this.classList.add('invalid-image')">`
                             : `<span class="invalid-image">[Imagem inválida: ${cleanSrc}]</span>`;
                     })
-                    // Blocos
                     .replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>')
                     .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
                     .replace(/`(.*?)`/g, '<code>$1</code>')
-                    // Listas
                     .replace(/^\s*[\*\-+]\s(.*$)/gm, '<li>$1</li>')
                     .replace(/^\s*\d+\.\s(.*$)/gm, '<li>$1</li>')
-                    // Linhas e quebras
                     .replace(/^\s*---\s*$/gm, '<hr>')
                     .replace(/  \n/g, '<br>')
-                    // Parágrafos
                     .replace(/^(?!<[a-z])(.*$)/gm, function(m) {
                         return m.trim() ? '<p>' + m + '</p>' : '';
                     });
 
-                // Processar listas
                 html = html.replace(/(<li>.*?<\/li>)+/g, function(match) {
                     return match.startsWith('<li>') ? '<ul>' + match + '</ul>' : match;
                 });
@@ -343,7 +780,6 @@ function exemplo() {
             }
         };
 
-        // Inicializar
         window.onload = initEditor;
     </script>
 </body>
